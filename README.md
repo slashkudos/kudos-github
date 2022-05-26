@@ -1,1 +1,1 @@
-# kudos-github
+# The official slashkudos GitHub App
