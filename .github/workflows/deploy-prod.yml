@@ -1,0 +1,48 @@
+# This workflow will deploy the GitHub app using AWS Amplify
+
+name: Deploy Production Github App 🤖
+
+on:
+  push:
+    branches: [main]
+    paths: [amplify/**]
+  workflow_dispatch: {}
+
+env:
+  node_version: "16.x"
+  amplify_env: prod
+  amplify_appId: d2rgnllrb072gz
+
+jobs:
+  deploy:
+    name: Deploy Prod
+    runs-on: ubuntu-latest
+    environment:
+      name: Production
+      url: https://restapi.slashkudos.com/github
+    concurrency: ${{ github.workflow }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: main
+      - name: Setup @aws-amplify/cli
+        uses: philip-gai/setup-aws-amplify-cli@v2
+        with:
+          cache_dependencies: "true"
+          cli_version: "7.6.22"
+          node_version: ${{ env.node_version }}
+          registry_url: "https://npm.pkg.github.com"
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Run amplify_pull.sh
+        run: ./scripts/amplify_pull.sh "$amplify_env" "$amplify_appId"
+      - name: amplify push
+        run: |
+          # GraphQL transformer version 2 outputs GraphQL API Key even with "CreateAPIKey": 0
+          amplify push --yes | grep -v "GraphQL API KEY"
+          exit $?
