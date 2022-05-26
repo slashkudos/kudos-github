@@ -43,6 +43,5 @@ jobs:
         run: ./scripts/amplify_pull.sh "$amplify_env" "$amplify_appId"
       - name: amplify push
         run: |
-          # GraphQL transformer version 2 outputs GraphQL API Key even with "CreateAPIKey": 0
-          amplify push --yes | grep -v "GraphQL API KEY"
+          amplify push --yes
           exit $?

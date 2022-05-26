@@ -36,4 +36,4 @@ jobs:
       - name: Run amplify_pull.sh
         run: ./scripts/amplify_pull.sh "$amplify_env" "$amplify_appId"
       - name: amplify status
-        run: amplify status -v | grep -v "GraphQL API KEY"
+        run: amplify status -v
