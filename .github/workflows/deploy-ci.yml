@@ -1,0 +1,39 @@
+# This workflow will deploy the GitHub app using AWS Amplify
+
+name: Deploy CI (Dry Run)
+
+on:
+  pull_request: {}
+  push:
+    branches: [develop]
+  workflow_dispatch: {}
+
+env:
+  node_version: "16.x"
+  amplify_env: prod
+  amplify_appId: d2rgnllrb072gz
+
+jobs:
+  deploy:
+    name: Deploy CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup @aws-amplify/cli
+        uses: philip-gai/setup-aws-amplify-cli@v2
+        with:
+          cache_dependencies: "true"
+          cli_version: "7.6.22"
+          node_version: ${{ env.node_version }}
+          registry_url: "https://npm.pkg.github.com"
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Run amplify_pull.sh
+        run: ./scripts/amplify_pull.sh "$amplify_env" "$amplify_appId"
+      - name: amplify status
+        run: amplify status -v | grep -v "GraphQL API KEY"
