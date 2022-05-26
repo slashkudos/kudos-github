@@ -13,9 +13,9 @@
     },
     "categories": {
       "function": {
-        "kudosgithubwebhookhandler": {
+        "githubwebhookshandler": {
           "deploymentBucketName": "amplify-kudosgithub-prod-42812-deployment",
-          "s3Key": "amplify-builds/kudosgithubwebhookhandler-485531717a456f4b5563-build.zip"
+          "s3Key": "amplify-builds/githubwebhookshandler-485531717a456f4b5563-build.zip"
         }
       }
     }

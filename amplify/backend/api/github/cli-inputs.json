@@ -3,7 +3,7 @@
   "paths": {
     "/webhooks": {
       "name": "/webhooks",
-      "lambdaFunction": "kudosgithubwebhookhandler",
+      "lambdaFunction": "githubwebhookshandler",
       "permissions": {
         "setting": "open"
       }

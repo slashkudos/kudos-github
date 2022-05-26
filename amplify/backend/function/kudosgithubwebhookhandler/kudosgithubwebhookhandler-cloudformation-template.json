@@ -47,12 +47,12 @@
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "kudosgithubwebhookhandler",
+            "githubwebhookshandler",
             {
               "Fn::Join": [
                 "",
                 [
-                  "kudosgithubwebhookhandler",
+                  "githubwebhookshandler",
                   "-",
                   {
                     "Ref": "env"

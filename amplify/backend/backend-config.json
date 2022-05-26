@@ -1,6 +1,6 @@
 {
   "function": {
-    "kudosgithubwebhookhandler": {
+    "githubwebhookshandler": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda",
@@ -15,7 +15,7 @@
       "dependsOn": [
         {
           "category": "function",
-          "resourceName": "kudosgithubwebhookhandler",
+          "resourceName": "githubwebhookshandler",
           "attributes": [
             "Name",
             "Arn"
