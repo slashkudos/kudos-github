@@ -10,6 +10,14 @@
       "StackName": "amplify-kudosgithub-prod-42812",
       "StackId": "arn:aws:cloudformation:us-east-1:391437285077:stack/amplify-kudosgithub-prod-42812/4154b9c0-dcac-11ec-a9a3-0a7c2d7659af",
       "AmplifyAppId": "d2rgnllrb072gz"
+    },
+    "categories": {
+      "function": {
+        "kudosgithubwebhookhandler": {
+          "deploymentBucketName": "amplify-kudosgithub-prod-42812-deployment",
+          "s3Key": "amplify-builds/kudosgithubwebhookhandler-485531717a456f4b5563-build.zip"
+        }
+      }
     }
   }
 }
