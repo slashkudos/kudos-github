@@ -41,6 +41,10 @@ jobs:
           aws-region: us-east-1
       - name: Run amplify_pull.sh
         run: ./scripts/amplify_pull.sh "$amplify_env" "$amplify_appId"
+      - name: Run amplify_prebuild.sh
+        run: ./scripts/amplify_prebuild.sh
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: amplify push
         run: |
           amplify push --yes
