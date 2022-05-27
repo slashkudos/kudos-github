@@ -3,8 +3,7 @@
     "githubwebhookshandler": {
       "build": true,
       "providerPlugin": "awscloudformation",
-      "service": "Lambda",
-      "dependsOn": []
+      "service": "Lambda"
     }
   },
   "auth": {},

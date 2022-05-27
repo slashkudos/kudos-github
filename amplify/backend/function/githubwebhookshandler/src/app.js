@@ -7,10 +7,7 @@ See the License for the specific language governing permissions and limitations 
 */
 
 
-/* Amplify Params - DO NOT EDIT
-	ENV
-	REGION
-Amplify Params - DO NOT EDIT */
+
 
 const express = require('express')
 const bodyParser = require('body-parser')
@@ -33,12 +30,12 @@ app.use(function(req, res, next) {
  * Example get method *
  **********************/
 
-app.get('/item', function(req, res) {
+app.get('/webhooks', function(req, res) {
   // Add your code here
   res.json({success: 'get call succeed!', url: req.url});
 });
 
-app.get('/item/*', function(req, res) {
+app.get('/webhooks/*', function(req, res) {
   // Add your code here
   res.json({success: 'get call succeed!', url: req.url});
 });
@@ -47,12 +44,12 @@ app.get('/item/*', function(req, res) {
 * Example post method *
 ****************************/
 
-app.post('/item', function(req, res) {
+app.post('/webhooks', function(req, res) {
   // Add your code here
   res.json({success: 'post call succeed!', url: req.url, body: req.body})
 });
 
-app.post('/item/*', function(req, res) {
+app.post('/webhooks/*', function(req, res) {
   // Add your code here
   res.json({success: 'post call succeed!', url: req.url, body: req.body})
 });
@@ -61,12 +58,12 @@ app.post('/item/*', function(req, res) {
 * Example put method *
 ****************************/
 
-app.put('/item', function(req, res) {
+app.put('/webhooks', function(req, res) {
   // Add your code here
   res.json({success: 'put call succeed!', url: req.url, body: req.body})
 });
 
-app.put('/item/*', function(req, res) {
+app.put('/webhooks/*', function(req, res) {
   // Add your code here
   res.json({success: 'put call succeed!', url: req.url, body: req.body})
 });
@@ -75,12 +72,12 @@ app.put('/item/*', function(req, res) {
 * Example delete method *
 ****************************/
 
-app.delete('/item', function(req, res) {
+app.delete('/webhooks', function(req, res) {
   // Add your code here
   res.json({success: 'delete call succeed!', url: req.url});
 });
 
-app.delete('/item/*', function(req, res) {
+app.delete('/webhooks/*', function(req, res) {
   // Add your code here
   res.json({success: 'delete call succeed!', url: req.url});
 });
