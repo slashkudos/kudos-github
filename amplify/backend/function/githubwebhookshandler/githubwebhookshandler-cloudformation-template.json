@@ -37,7 +37,7 @@
     "LambdaFunction": {
       "Type": "AWS::Lambda::Function",
       "Metadata": {
-        "aws:asset:path": "./src",
+        "aws:asset:path": "./src/lib",
         "aws:asset:property": "Code"
       },
       "Properties": {

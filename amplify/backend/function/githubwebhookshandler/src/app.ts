@@ -1,5 +1,5 @@
 import { Probot } from "probot";
 
-export = (app: Probot) => {
+exports.app = (app: Probot) => {
   app.onAny((event) => console.log(`EVENT: ${JSON.stringify(event)}`));
 };
