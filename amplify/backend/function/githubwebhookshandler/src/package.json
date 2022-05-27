@@ -6,6 +6,7 @@
   "author": "Philip Gai <philip@slashkudos.com>",
   "license": "Apache",
   "homepage": "https://github.com/slashkudos/kudos-github",
+  "type": "commonjs",
   "scripts": {
     "build": "rm -rf ./lib && tsc -p ../tsconfig.json",
     "start": "probot run ./lib/app.js",
