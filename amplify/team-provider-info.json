@@ -15,7 +15,9 @@
       "function": {
         "githubwebhookshandler": {
           "deploymentBucketName": "amplify-kudosgithub-prod-42812-deployment",
-          "s3Key": "amplify-builds/githubwebhookshandler-485531717a456f4b5563-build.zip"
+          "s3Key": "amplify-builds/githubwebhookshandler-485531717a456f4b5563-build.zip",
+          "appId": "205195",
+          "secretsPathAmplifyAppId": "d2rgnllrb072gz"
         }
       }
     }

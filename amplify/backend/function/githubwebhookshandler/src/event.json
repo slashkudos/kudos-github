@@ -1,5 +1,12 @@
 {
-  "key1": "value1",
-  "key2": "value2",
-  "key3": "value3"
+  "headers": {
+    "x-github-delivery": "mock",
+    "x-github-event": "mock",
+    "x-hub-signature": "mock"
+  },
+  "body": {
+    "key1": "value1",
+    "key2": "value2",
+    "key3": "value3"
+  }
 }
