@@ -1,5 +1,5 @@
 const { Probot } = require('probot');
-const slashkudosBot = require('./lib/index');
+const slashkudosBot = require('./app');
 const aws = require("aws-sdk");
 
 exports.handler = async (event) => {

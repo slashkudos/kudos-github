@@ -7,8 +7,8 @@
   "license": "Apache",
   "homepage": "https://github.com/slashkudos/kudos-github",
   "scripts": {
-    "build": "tsc",
-    "start": "probot run ./lib/index.js",
+    "build": "rm -rf ./lib && tsc -p ../tsconfig.json",
+    "start": "probot run ./lib/app.js",
     "test": "jest",
     "dev": "npm run build && npm run start"
   },
