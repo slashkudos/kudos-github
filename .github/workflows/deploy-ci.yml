@@ -39,3 +39,7 @@ jobs:
         run: ./scripts/amplify_prebuild.sh
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: amplify status
+        run: amplify status -v
+      - name: Mock githubwebhookshandler function
+        run: amplify mock function githubwebhookshandler --event lib/event.json
