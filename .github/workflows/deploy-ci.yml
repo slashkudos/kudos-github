@@ -40,4 +40,4 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Mock githubwebhookshandler function
-        run: amplify mock function githubwebhookshandler --event src/event.json
+        run: amplify mock function githubwebhookshandler --event lib/event.json

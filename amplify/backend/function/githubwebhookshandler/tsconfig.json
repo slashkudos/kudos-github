@@ -8,7 +8,7 @@
     "allowJs": true /* Allow javascript files to be compiled. */,
     "declaration": true /* Generates corresponding '.d.ts' file. */,
     "sourceMap": true /* Generates corresponding '.map' file. */,
-    "outDir": "./src/lib" /* Redirect output structure to the directory. */,
+    "outDir": "src" /* Redirect output structure to the directory. */,
     "strict": true /* Enable all strict type-checking options. */,
     "noUnusedLocals": true /* Report errors on unused locals. */,
     "noUnusedParameters": true /* Report errors on unused parameters. */,
@@ -21,6 +21,6 @@
     "pretty": false,
     "skipLibCheck": true
   },
-  "include": ["src", "src/package*.json"],
+  "include": ["lib", "lib/package*.json"],
   "compileOnSave": false
 }

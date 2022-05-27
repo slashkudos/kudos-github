@@ -8,8 +8,8 @@
   "homepage": "https://github.com/slashkudos/kudos-github",
   "type": "commonjs",
   "scripts": {
-    "build": "rm -rf ./lib && tsc -p ../tsconfig.json",
-    "start": "probot run ./lib/app.js",
+    "build": "rm -rf ../src && tsc -p ../tsconfig.json",
+    "start": "probot run ../src/app.js",
     "test": "jest",
     "dev": "npm run build && npm run start"
   },
