@@ -1,0 +1,29 @@
+# Learn more about the syntax here:
+# https://docs.github.com/en/early-access/github/save-time-with-slash-commands/syntax-for-user-defined-slash-commands
+---
+trigger: kudos
+title: kudos
+description: "/kudos @philip-gai for the super clean PR 😎"
+steps:
+  - type: form
+    style: embedded
+    body:
+      - type: input
+        attributes:
+          label: User
+          description: Who do you want to give the kudos to?
+          placeholder: "@user"
+        validations:
+          required: true
+      - type: input
+        attributes:
+          label: Message
+          description: "What did they do?"
+          placeholder: "for being awesome"
+        validations:
+          required: true
+    actions:
+      submit: "Create"
+      cancel: "Discard"
+  - type: fill
+    template: "Congrats {{ data.User }}, you just got some kudos from {{ command.user.login }}!"
