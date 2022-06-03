@@ -1,12 +1,19 @@
-import { APIGatewayEvent } from "aws-lambda";
+import { APIGatewayEvent, APIGatewayProxyResultV2 } from "aws-lambda";
 import { Probot } from "probot";
 import slashkudosBot from "./app";
 import aws from "aws-sdk";
-import { WebhookEvent, WebhookEvents } from "@octokit/webhooks";
+import {
+  EmitterWebhookEvent,
+  EmitterWebhookEventName,
+  EmitterWebhookEventWithStringPayloadAndSignature,
+} from "@octokit/webhooks/dist-types/types";
 
 type SecretName = "PRIVATE_KEY" | "WEBHOOK_SECRET";
 
-exports.handler = async (event: APIGatewayEvent) => {
+const handler = async (
+  event: APIGatewayEvent
+): Promise<APIGatewayProxyResultV2> => {
+  console.log(`EVENT: ${JSON.stringify(event)}`);
   const secretNames: SecretName[] = ["PRIVATE_KEY", "WEBHOOK_SECRET"];
   const ssmParameterNames = secretNames
     .map((secretName) => process.env[secretName])
@@ -54,29 +61,47 @@ exports.handler = async (event: APIGatewayEvent) => {
 
   await probot.load(slashkudosBot);
 
-  const webhookEvent: WebhookEvent<any> & {
-    signature: string;
-  } = {
-    id: event.headers["x-github-delivery"] || "",
-    name: (event.headers["x-github-event"] || "*") as unknown as WebhookEvents,
+  const eventHeaders = {
+    id: event.headers["x-github-delivery"],
+    name: event.headers["x-github-event"],
     signature: event.headers["x-hub-signature"] || "",
-    payload: JSON.parse(event.body || "{}"),
   };
 
-  if (!webhookEvent.id) {
+  if (!eventHeaders.id) {
     throw new Error("Missing x-github-delivery header");
   }
-  if (!webhookEvent.name) {
+  if (!eventHeaders.name) {
     throw new Error("Missing x-github-event header");
   }
-  if (!webhookEvent.signature && process.env.IS_MOCK !== "true") {
+  if (!eventHeaders.signature && process.env.IS_MOCK !== "true") {
     throw new Error("Missing x-hub-signature header");
   }
 
-  if (process.env.IS_MOCK === "true") {
-    console.log("Mock: Skipping signature verification");
-    return await probot.webhooks.receive(webhookEvent);
-  } else {
-    return await probot.webhooks.verifyAndReceive(webhookEvent);
+  const webhookEvent: EmitterWebhookEventWithStringPayloadAndSignature = {
+    id: eventHeaders.id,
+    name: eventHeaders.name as unknown as EmitterWebhookEventName,
+    signature: eventHeaders.signature,
+    payload: JSON.parse(event.body || "{}"),
+  };
+
+  try {
+    if (process.env.IS_MOCK === "true") {
+      console.log("Mock: Skipping signature verification");
+      await probot.webhooks.receive(
+        webhookEvent as unknown as EmitterWebhookEvent
+      );
+    } else {
+      await probot.webhooks.verifyAndReceive(webhookEvent);
+    }
+    return {
+      statusCode: 200,
+    };
+  } catch (error) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: "Something went wrong." }),
+    };
   }
 };
+
+export default handler;

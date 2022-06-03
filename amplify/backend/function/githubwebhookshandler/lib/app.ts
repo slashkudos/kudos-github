@@ -1,5 +1,7 @@
 import { Probot } from "probot";
 
-export = (app: Probot) => {
+const app = (app: Probot) => {
   app.onAny((event) => console.log(`EVENT: ${JSON.stringify(event)}`));
 };
+
+export default app;
