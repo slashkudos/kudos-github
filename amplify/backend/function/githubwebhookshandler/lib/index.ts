@@ -14,36 +14,47 @@ const handler = async (
   event: APIGatewayEvent
 ): Promise<APIGatewayProxyResultV2> => {
   console.log(`EVENT: ${JSON.stringify(event)}`);
-  const secretNames: SecretName[] = ["PRIVATE_KEY", "WEBHOOK_SECRET"];
-  const ssmParameterNames = secretNames
-    .map((secretName) => process.env[secretName])
-    .filter((parameterPath) => !parameterPath) as string[];
 
-  const { Parameters } = await new aws.SSM()
-    .getParameters({
-      Names: ssmParameterNames,
-      WithDecryption: true,
-    })
-    .promise();
+  const isMock = process.env.AWS_EXECUTION_ENV === "AWS_Lambda_amplify-mock";
+  process.env.IS_MOCK = isMock.toString();
 
-  if (!Parameters) {
-    throw new Error("No parameters found");
+  let privateKeyBase64: string;
+
+  if (isMock) {
+    process.env.WEBHOOK_SECRET = process.env.WEBHOOK_SECRET || "MOCK";
+    process.env.APP_ID = process.env.APP_ID || "MOCK";
+    privateKeyBase64 = Buffer.from(
+      process.env.PRIVATE_KEY || "MOCK",
+      "base64"
+    ).toString("utf-8");
+  } else {
+    // Get secrets from SSM
+    const secretNames: SecretName[] = ["PRIVATE_KEY", "WEBHOOK_SECRET"];
+    const ssmParameterNames = secretNames
+      .map((secretName) => process.env[secretName])
+      .filter((parameterPath) => !parameterPath) as string[];
+
+    const { Parameters } = await new aws.SSM()
+      .getParameters({
+        Names: ssmParameterNames,
+        WithDecryption: true,
+      })
+      .promise();
+    if (!Parameters) {
+      throw new Error("No parameters found");
+    }
+    const privateKey = Parameters.find((p) =>
+      p.Name?.endsWith("PRIVATE_KEY")
+    )?.Value;
+    if (!privateKey) {
+      throw "Missing PRIVATE_KEY";
+    }
+    privateKeyBase64 = Buffer.from(privateKey, "base64").toString("utf-8");
+    process.env.WEBHOOK_SECRET = Parameters.find((p) =>
+      p.Name?.endsWith("WEBHOOK_SECRET")
+    )?.Value;
   }
 
-  process.env.PRIVATE_KEY = Parameters.find((p) =>
-    p.Name?.endsWith("PRIVATE_KEY")
-  )?.Value;
-  process.env.WEBHOOK_SECRET = Parameters.find((p) =>
-    p.Name?.endsWith("WEBHOOK_SECRET")
-  )?.Value;
-
-  process.env.IS_MOCK = (
-    process.env.AWS_EXECUTION_ENV === "AWS_Lambda_amplify-mock"
-  ).toString();
-
-  if (!process.env.PRIVATE_KEY) {
-    throw "Missing PRIVATE_KEY";
-  }
   if (!process.env.WEBHOOK_SECRET) {
     throw "Missing WEBHOOK_SECRET";
   }
@@ -53,9 +64,7 @@ const handler = async (
 
   let probot = new Probot({
     appId: process.env.APP_ID,
-    privateKey: Buffer.from(process.env.PRIVATE_KEY, "base64").toString(
-      "utf-8"
-    ),
+    privateKey: privateKeyBase64,
     secret: process.env.WEBHOOK_SECRET,
   });
 
@@ -73,7 +82,7 @@ const handler = async (
   if (!eventHeaders.name) {
     throw new Error("Missing x-github-event header");
   }
-  if (!eventHeaders.signature && process.env.IS_MOCK !== "true") {
+  if (!eventHeaders.signature && !isMock) {
     throw new Error("Missing x-hub-signature header");
   }
 
@@ -85,7 +94,7 @@ const handler = async (
   };
 
   try {
-    if (process.env.IS_MOCK === "true") {
+    if (isMock) {
       console.log("Mock: Skipping signature verification");
       await probot.webhooks.receive(
         webhookEvent as unknown as EmitterWebhookEvent
