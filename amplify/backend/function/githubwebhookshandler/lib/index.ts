@@ -71,19 +71,19 @@ const handler = async (
   await probot.load(slashkudosBot);
 
   const eventHeaders = {
-    id: event.headers["x-github-delivery"],
-    name: event.headers["x-github-event"],
-    signature: event.headers["x-hub-signature"] || "",
+    id: event.headers["X-GitHub-Delivery"],
+    name: event.headers["X-GitHub-Event"],
+    signature: event.headers["X-Hub-Signature"] || "",
   };
 
   if (!eventHeaders.id) {
-    throw new Error("Missing x-github-delivery header");
+    throw new Error("Missing X-GitHub-Delivery header");
   }
   if (!eventHeaders.name) {
-    throw new Error("Missing x-github-event header");
+    throw new Error("Missing X-GitHub-Event header");
   }
   if (!eventHeaders.signature && !isMock) {
-    throw new Error("Missing x-hub-signature header");
+    throw new Error("Missing X-Hub-Signature header");
   }
 
   const webhookEvent: EmitterWebhookEventWithStringPayloadAndSignature = {
