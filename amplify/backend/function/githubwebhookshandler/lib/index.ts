@@ -32,7 +32,7 @@ const handler = async (
     const secretNames: SecretName[] = ["PRIVATE_KEY", "WEBHOOK_SECRET"];
     const ssmParameterNames = secretNames
       .map((secretName) => process.env[secretName])
-      .filter((parameterPath) => !parameterPath) as string[];
+      .filter((parameterPath) => parameterPath != null) as string[];
 
     const { Parameters } = await new aws.SSM()
       .getParameters({
