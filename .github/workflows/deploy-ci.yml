@@ -42,4 +42,5 @@ jobs:
       - name: amplify status
         run: amplify status -v
       - name: Mock githubwebhookshandler function
-        run: amplify mock function githubwebhookshandler --event lib/event.json
+        run: |
+          amplify mock function githubwebhookshandler --event lib/event.json | tee /dev/stderr | grep -q '"statusCode": 200'
