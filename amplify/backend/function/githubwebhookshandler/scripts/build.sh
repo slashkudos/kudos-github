@@ -7,7 +7,10 @@ rm -rf ./src
 echo "Compiling typescript files."
 tsc -p ./tsconfig.json
 
-echo "Copying package*.json files to the src folder."
+echo "Copying package*.json files into the src folder."
 cp package*.json src/
 
-echo "Done!"
+echo "Copying .npmrc into the src folder."
+cp .npmrc src/
+
+echo "Done."
