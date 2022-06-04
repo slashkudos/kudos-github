@@ -115,12 +115,13 @@ async function createComment(
   mention: string
 ) {
   const octokit = eventContext.octokit;
-  const body = `Congrats @${mention}, you just received some kudos! :tada:`;
+  const body = `Congrats @${mention}, you just received some kudos! :tada:\n\nView more at [app.slashkudos.com](https://app.slashkudos.com/)`;
   if (eventContext.name === "issue_comment") {
     console.log("Creating comment on issue");
+    const quoteOriginalComment = `> ${eventContext.payload.comment.body.trim()}\n\n`;
     await octokit.issues.createComment({
       ...eventContext.issue(),
-      body: body,
+      body: `${quoteOriginalComment}${body}`,
     });
   } else if (eventContext.name === "pull_request_review_comment") {
     console.log("Creating reply on PR review comment");
