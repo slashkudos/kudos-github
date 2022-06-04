@@ -1,6 +1,6 @@
 # This workflow will deploy the GitHub app using AWS Amplify
 
-name: Deploy Production Github App 🤖
+name: App Deploy 🤖
 
 on:
   push:

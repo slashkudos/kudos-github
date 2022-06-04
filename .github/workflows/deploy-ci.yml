@@ -1,6 +1,6 @@
 # This workflow will deploy the GitHub app using AWS Amplify
 
-name: Deploy CI (Dry Run)
+name: App CI 🧪
 
 on:
   pull_request: {}
