@@ -7,6 +7,7 @@ import {
 import { EmitterWebhookEvent } from "@octokit/webhooks/dist-types/types";
 import { User } from "@octokit/webhooks-types";
 import { GitHubComment } from "./models/GitHub/GitHubComment";
+import { AddDiscussionCommentPayload } from "@octokit/graphql-schema";
 
 const app = (app: Probot) => {
   app.onAny((event: EmitterWebhookEvent): void =>
@@ -21,7 +22,7 @@ const app = (app: Probot) => {
     async (eventContext) => {
       console.log(`Received ${eventContext.name} event`);
 
-      const comment = eventContext.payload.comment;
+      const comment = eventContext.payload.comment as GitHubComment;
       const commentBody = comment.body.trim();
 
       let slashCommand = "/kudos";
@@ -64,14 +65,8 @@ const app = (app: Probot) => {
             continue;
           }
 
-          await createKudo(
-            kudosClient,
-            giver,
-            receiverUser,
-            comment as GitHubComment
-          );
-
-          await createComment(eventContext, mention);
+          await createKudo(kudosClient, giver, receiverUser, comment);
+          await createComment(eventContext, mention, comment);
         }
       } else {
         console.log("Not a kudos comment");
@@ -112,45 +107,48 @@ async function createComment(
     | "discussion_comment.created"
     | "pull_request_review_comment.created"
   >,
-  mention: string
+  mention: string,
+  comment: GitHubComment
 ) {
   const octokit = eventContext.octokit;
   const body = `Congrats @${mention}, you just received some kudos! :tada:. View more at [app.slashkudos.com](https://app.slashkudos.com/).`;
+
+  const quoteOriginalComment = `> ${comment.body.trim()}\n\n`;
+  const bodyWithQuote = `${quoteOriginalComment}${body}`;
   if (eventContext.name === "issue_comment") {
     console.log("Creating comment on issue");
-    const quoteOriginalComment = `> ${eventContext.payload.comment.body.trim()}\n\n`;
     await octokit.issues.createComment({
       ...eventContext.issue(),
-      body: `${quoteOriginalComment}${body}`,
+      body: bodyWithQuote,
     });
   } else if (eventContext.name === "pull_request_review_comment") {
     console.log("Creating reply on PR review comment");
     await octokit.pulls.createReplyForReviewComment({
       ...eventContext.pullRequest(),
-      comment_id: eventContext.payload.comment.id,
+      comment_id: comment.id,
       body: body,
     });
   } else if (eventContext.name === "discussion_comment") {
-    // https://docs.github.com/en/graphql/guides/using-the-graphql-api-for-discussions
-    console.log("NOT YET IMPLEMENTED: Adding discussion comment");
-
-    // eventContext.octokit.graphql<{
-    //   addComment: AddCommentPayload;
-    // }>(
-    //   `mutation {
-    //     # input type: AddCommentInput
-    //     addComment(input: {repositoryId: "1234", categoryId: "5678", body: "The body", title: "The title"}) {
-    //       # response type: CreateDiscussionPayload
-    //       discussion {
-    //         id
-    //       }
-    //     }
-    //   }`,
-    //   {
-    //     owner: options.owner,
-    //     repo: options.repo,
-    //   }
-    // );
+    console.log("Creating reply to discussion comment");
+    // https://docs.github.com/en/graphql/guides/using-the-graphql-api-for-discussions#adddiscussioncomment
+    await octokit.graphql<{
+      addDiscussionComment: AddDiscussionCommentPayload;
+    }>(
+      `mutation ($body: String!, $discussionId: ID!, $replyToId: ID, $clientMutationId: String) {
+        # input type: AddDiscussionCommentInput
+        addDiscussionComment(input: {body: $body, discussionId: $discussionId, replyToId: $replyToId, clientMutationId: $clientMutationId}) {
+          # response type: AddDiscussionCommentPayload
+          comment {
+            id
+          }
+        }
+      }`,
+      {
+        body: bodyWithQuote,
+        discussionId: comment.discussion_id,
+        replyToId: comment.node_id,
+      }
+    );
   }
 }
 
