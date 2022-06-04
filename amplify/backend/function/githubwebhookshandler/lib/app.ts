@@ -23,13 +23,17 @@ const app = (app: Probot) => {
       const comment = eventContext.payload.comment;
 
       let slashCommand = "/kudos";
-      if (process.env.IS_PROD_APP === "false") {
+      if (process.env.IS_PROD_APP !== "true") {
         slashCommand += "-dev";
       }
       // Make sure we check for the space after the slash command
       slashCommand += " ";
 
-      if (comment.body.startsWith(`${slashCommand} `)) {
+      console.log(`Checking comment for kudos.`);
+      console.log(
+        `Comment: "${comment.body}"\nSlash Command: "${slashCommand}"`
+      );
+      if (comment.body.startsWith(slashCommand)) {
         console.log("Kudos!");
 
         const kudosClient = await getKudosClient();
@@ -58,6 +62,8 @@ const app = (app: Probot) => {
 
           createComment(eventContext, mention);
         }
+      } else {
+        console.log("Not a kudos comment");
       }
 
       async function createKudo(
