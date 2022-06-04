@@ -7,7 +7,10 @@ import {
 import { EmitterWebhookEvent } from "@octokit/webhooks/dist-types/types";
 import { User } from "@octokit/webhooks-types";
 import { GitHubComment } from "./models/GitHub/GitHubComment";
-import { AddDiscussionCommentPayload } from "@octokit/graphql-schema";
+import {
+  AddDiscussionCommentInput,
+  AddDiscussionCommentPayload,
+} from "@octokit/graphql-schema";
 import { GitHubCommentCreatedEvent } from "./models/GitHub/GitHubCommentCreatedEvent";
 
 const app = (app: Probot) => {
@@ -95,14 +98,10 @@ async function createKudo(
   });
 }
 
-/** Adds a comment to an Issue or Pull Request. */
-// addComment?: Maybe<AddCommentPayload>;
-/** Adds a comment to a Discussion, possibly as a reply to another comment. */
-// addDiscussionComment?: Maybe<AddDiscussionCommentPayload>;
-/** Adds a comment to a review. */
-// addPullRequestReviewComment?: Maybe<AddPullRequestReviewCommentPayload>;
 /** Creates a new team discussion comment. */
 // createTeamDiscussionComment?: Maybe<CreateTeamDiscussionCommentPayload>;
+// https://docs.github.com/en/graphql/reference/mutations#createteamdiscussioncomment
+
 async function createComment(
   eventContext: Context<
     | "issue_comment.created"
@@ -132,7 +131,12 @@ async function createComment(
     });
   } else if (eventContext.name === "discussion_comment") {
     console.log("Creating reply to discussion comment");
-    // https://docs.github.com/en/graphql/guides/using-the-graphql-api-for-discussions#adddiscussioncomment
+    // https://docs.github.com/en/graphql/reference/mutations#adddiscussioncomment
+    const input: AddDiscussionCommentInput = {
+      body: body,
+      discussionId: payload.discussion.node_id,
+      replyToId: payload.comment.node_id,
+    };
     await octokit.graphql<{
       addDiscussionComment: AddDiscussionCommentPayload;
     }>(
@@ -145,11 +149,7 @@ async function createComment(
           }
         }
       }`,
-      {
-        body: body,
-        discussionId: payload.discussion.node_id,
-        replyToId: payload.comment.node_id,
-      }
+      input
     );
   }
   console.log("Comment created");
