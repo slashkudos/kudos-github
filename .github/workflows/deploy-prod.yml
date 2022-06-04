@@ -47,7 +47,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Mock githubwebhookshandler function
         run: |
-          amplify mock function githubwebhookshandler --event lib/event.json | tee /dev/stderr | grep -q '"statusCode": 200'
+          amplify mock function githubwebhookshandler --event event.json | tee /dev/stderr | grep -q '"statusCode": 200'
       - name: amplify push
         run: |
           amplify push --yes
