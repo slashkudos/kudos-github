@@ -8,12 +8,14 @@
   "homepage": "https://github.com/slashkudos/kudos-github",
   "type": "commonjs",
   "scripts": {
-    "build": "rm -rf ../src && tsc -p ../tsconfig.json",
-    "start": "probot run ../src/app.js",
+    "build": "bash ./scripts/build.sh",
+    "start": "probot run ./src/app.js",
     "test": "jest",
     "dev": "npm run build && npm run start"
   },
   "dependencies": {
+    "@octokit/graphql-schema": "^10.73.0",
+    "@slashkudos/kudos-api": "1.2.9",
     "aws-sdk": "^2.1148.0",
     "probot": "^12.2.4"
   },
