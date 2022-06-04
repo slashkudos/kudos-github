@@ -131,6 +131,7 @@ async function createComment(
       body: body,
     });
   } else if (eventContext.name === "discussion_comment") {
+    // https://docs.github.com/en/graphql/guides/using-the-graphql-api-for-discussions
     console.log("NOT YET IMPLEMENTED: Adding discussion comment");
 
     // eventContext.octokit.graphql<{
