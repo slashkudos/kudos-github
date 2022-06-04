@@ -19,8 +19,17 @@ const app = (app: Probot) => {
     ],
     async (eventContext) => {
       console.log(`Received ${eventContext.name} event`);
+
       const comment = eventContext.payload.comment;
-      if (comment.body.startsWith("/kudos")) {
+
+      let slashCommand = "/kudos";
+      if (process.env.IS_PROD_APP === "false") {
+        slashCommand += "-dev";
+      }
+      // Make sure we check for the space after the slash command
+      slashCommand += " ";
+
+      if (comment.body.startsWith(`${slashCommand} `)) {
         console.log("Kudos!");
 
         const kudosClient = await getKudosClient();

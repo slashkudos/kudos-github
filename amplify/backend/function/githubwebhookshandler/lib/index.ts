@@ -17,6 +17,7 @@ const handler = async (
 
   const isMock = process.env.AWS_EXECUTION_ENV === "AWS_Lambda_amplify-mock";
   process.env.IS_MOCK = isMock.toString();
+  process.env.IS_PROD_APP = (process.env.APP_ID === "205195").toString();
 
   let privateKeyBase64: string;
 
