@@ -115,7 +115,7 @@ async function createComment(
   mention: string
 ) {
   const octokit = eventContext.octokit;
-  const body = `Congrats @${mention}, you just received some kudos! :tada:\n\nView more at [app.slashkudos.com](https://app.slashkudos.com/)`;
+  const body = `Congrats @${mention}, you just received some kudos! :tada:. View more at [app.slashkudos.com](https://app.slashkudos.com/).`;
   if (eventContext.name === "issue_comment") {
     console.log("Creating comment on issue");
     const quoteOriginalComment = `> ${eventContext.payload.comment.body.trim()}\n\n`;
