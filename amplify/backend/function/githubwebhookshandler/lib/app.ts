@@ -98,10 +98,6 @@ async function createKudo(
   });
 }
 
-/** Creates a new team discussion comment. */
-// createTeamDiscussionComment?: Maybe<CreateTeamDiscussionCommentPayload>;
-// https://docs.github.com/en/graphql/reference/mutations#createteamdiscussioncomment
-
 async function createComment(
   eventContext: Context<
     | "issue_comment.created"
