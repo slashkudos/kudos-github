@@ -4,8 +4,9 @@ import {
   KudosApiClient,
   KudosGraphQLConfig,
 } from "@slashkudos/kudos-api";
-import { GitHubUser } from "./models/GitHub/GitHubUser";
 import { EmitterWebhookEvent } from "@octokit/webhooks/dist-types/types";
+import { User } from "@octokit/webhooks-types";
+import { GitHubComment } from "./models/GitHub/GitHubComment";
 
 const app = (app: Probot) => {
   app.onAny((event: EmitterWebhookEvent): void =>
@@ -45,45 +46,56 @@ const app = (app: Probot) => {
           .map((mention) => mention.substring(1));
         console.log("Mentions: " + mentions);
 
+        if (mentions.length === 0) {
+          console.log("No mentions found.");
+        }
+
         const giver = comment.user.login;
         for (const mention of mentions) {
           const receiverLogin = mention;
           const getReceiverResponse = await octokit.users.getByUsername({
             username: receiverLogin,
           });
-          const receiverUser = getReceiverResponse.data as GitHubUser;
+          const receiverUser = getReceiverResponse.data as User;
 
           if (!receiverUser) {
             console.log("WARN: Could not find user: " + receiverLogin);
             continue;
           }
 
-          await createKudo(kudosClient, giver, receiverUser);
+          await createKudo(
+            kudosClient,
+            giver,
+            receiverUser,
+            comment as GitHubComment
+          );
 
-          createComment(eventContext, mention);
+          await createComment(eventContext, mention);
         }
       } else {
         console.log("Not a kudos comment");
       }
-
-      async function createKudo(
-        kudosClient: KudosApiClient,
-        giver: string,
-        receiverUser: GitHubUser
-      ) {
-        await kudosClient.createKudo({
-          giverUsername: giver,
-          receiverUsername: receiverUser.login,
-          message: comment.body,
-          link: comment.html_url,
-          giverProfileImageUrl: comment.user.avatar_url,
-          receiverProfileImageUrl: receiverUser.avatar_url,
-          dataSource: DataSourceApp.github,
-        });
-      }
     }
   );
 };
+
+async function createKudo(
+  kudosClient: KudosApiClient,
+  giver: string,
+  receiverUser: User,
+  comment: GitHubComment
+) {
+  const link = comment.html_url || comment.url;
+  await kudosClient.createKudo({
+    giverUsername: giver,
+    receiverUsername: receiverUser.login,
+    message: comment.body,
+    link: link,
+    giverProfileImageUrl: comment.user.avatar_url,
+    receiverProfileImageUrl: receiverUser.avatar_url,
+    dataSource: DataSourceApp.github,
+  });
+}
 
 /** Adds a comment to an Issue or Pull Request. */
 // addComment?: Maybe<AddCommentPayload>;
