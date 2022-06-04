@@ -115,18 +115,22 @@ async function createComment(
 ) {
   const octokit = eventContext.octokit;
   const body = `Congrats @${mention}, you just received some kudos! :tada:`;
-  if (eventContext.name === "issue_comment.created") {
+  if (eventContext.name === "issue_comment") {
+    console.log("Creating comment on issue");
     await octokit.issues.createComment({
       ...eventContext.issue(),
       body: body,
     });
-  } else if (eventContext.name === "pull_request_review_comment.created") {
+  } else if (eventContext.name === "pull_request_review_comment") {
+    console.log("Creating reply on PR review comment");
     await octokit.pulls.createReplyForReviewComment({
       ...eventContext.pullRequest(),
       comment_id: eventContext.payload.comment.id,
       body: body,
     });
-  } else if (eventContext.name === "discussion_comment.created") {
+  } else if (eventContext.name === "discussion_comment") {
+    console.log("NOT YET IMPLEMENTED: Adding discussion comment");
+
     // eventContext.octokit.graphql<{
     //   addComment: AddCommentPayload;
     // }>(
