@@ -1,6 +1,6 @@
 # This workflow will deploy the GitHub app using AWS Amplify
 
-name: Deploy CI (Dry Run)
+name: App CI 🧪
 
 on:
   pull_request: {}
@@ -43,4 +43,4 @@ jobs:
         run: amplify status -v
       - name: Mock githubwebhookshandler function
         run: |
-          amplify mock function githubwebhookshandler --event lib/event.json | tee /dev/stderr | grep -q '"statusCode": 200'
+          amplify mock function githubwebhookshandler --event event.json | tee /dev/stderr | grep -q '"statusCode": 200'

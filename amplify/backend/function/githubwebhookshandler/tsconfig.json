@@ -21,6 +21,6 @@
     "pretty": false,
     "skipLibCheck": true
   },
-  "include": ["lib", "lib/package*.json"],
+  "include": ["lib"],
   "compileOnSave": false
 }
