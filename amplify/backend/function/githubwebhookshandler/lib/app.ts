@@ -22,6 +22,7 @@ const app = (app: Probot) => {
       console.log(`Received ${eventContext.name} event`);
 
       const comment = eventContext.payload.comment;
+      const commentBody = comment.body.trim();
 
       let slashCommand = "/kudos";
       if (process.env.IS_PROD_APP !== "true") {
@@ -32,15 +33,15 @@ const app = (app: Probot) => {
 
       console.log(`Checking comment for kudos.`);
       console.log(
-        `Comment: "${comment.body}"\nSlash Command: "${slashCommand}"`
+        `Comment: "${commentBody}"\nSlash Command: "${slashCommand}"`
       );
-      if (comment.body.startsWith(slashCommand)) {
+      if (commentBody.startsWith(slashCommand)) {
         console.log("Kudos!");
 
         const kudosClient = await getKudosClient();
         const octokit = eventContext.octokit;
 
-        const mentions = comment.body
+        const mentions = commentBody
           .split(" ")
           .filter((word) => word.startsWith("@") && word.length > 1)
           .map((mention) => mention.substring(1));
@@ -89,7 +90,7 @@ async function createKudo(
   await kudosClient.createKudo({
     giverUsername: giver,
     receiverUsername: receiverUser.login,
-    message: comment.body,
+    message: comment.body.trim(),
     link: link,
     giverProfileImageUrl: comment.user.avatar_url,
     receiverProfileImageUrl: receiverUser.avatar_url,
