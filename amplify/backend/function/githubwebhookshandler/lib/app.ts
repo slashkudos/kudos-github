@@ -138,13 +138,11 @@ async function createComment(
     console.log("WARN: Could not find total kudos for receiver: " + receiver);
   }
 
-  const quoteOriginalComment = `> ${payload.comment.body.trim()}\n\n`;
-  const bodyWithQuote = `${quoteOriginalComment}${commentBody}`;
   if (eventContext.name === "issue_comment") {
     console.log("Creating comment on issue");
     await octokit.issues.createComment({
       ...eventContext.issue(),
-      body: bodyWithQuote,
+      body: commentBody,
     });
   } else if (eventContext.name === "pull_request_review_comment") {
     console.log("Creating reply on PR review comment");
