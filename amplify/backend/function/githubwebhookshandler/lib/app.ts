@@ -71,7 +71,12 @@ const app = (app: Probot) => {
           }
 
           await createKudo(kudosClient, giver, receiverUser, comment);
-          await createComment(eventContext, mention, payload);
+
+          const userTotal = await kudosClient.getTotalKudosForReceiver(
+            receiverLogin,
+            DataSourceApp.github
+          );
+          await createComment(eventContext, receiverLogin, payload, userTotal);
         }
       } else {
         console.log("Not a kudos comment");
@@ -104,14 +109,24 @@ async function createComment(
     | "discussion_comment.created"
     | "pull_request_review_comment.created"
   >,
-  mention: string,
-  payload: GitHubCommentCreatedEvent
+  receiver: string,
+  payload: GitHubCommentCreatedEvent,
+  totalKudos?: number | null
 ) {
   const octokit = eventContext.octokit;
-  const body = `Congrats @${mention}, you just received some kudos! :tada:. View more at [app.slashkudos.com](https://app.slashkudos.com/).`;
+
+  let commentBody = `Congrats @${receiver}, you just got another [kudo](https://app.slashkudos.com/)! :tada:`;
+  if (totalKudos) {
+    commentBody = `Congrats @${receiver}, you now have ${totalKudos} [kudos](https://app.slashkudos.com/)! :tada:`;
+    if (totalKudos === 1) {
+      commentBody = `Congrats @${receiver}, you just got your first [kudo](https://app.slashkudos.com/)! :tada: :partying_face:`;
+    }
+  } else {
+    console.log("WARN: Could not find total kudos for receiver: " + receiver);
+  }
 
   const quoteOriginalComment = `> ${payload.comment.body.trim()}\n\n`;
-  const bodyWithQuote = `${quoteOriginalComment}${body}`;
+  const bodyWithQuote = `${quoteOriginalComment}${commentBody}`;
   if (eventContext.name === "issue_comment") {
     console.log("Creating comment on issue");
     await octokit.issues.createComment({
@@ -123,13 +138,13 @@ async function createComment(
     await octokit.pulls.createReplyForReviewComment({
       ...eventContext.pullRequest(),
       comment_id: payload.comment.id,
-      body: body,
+      body: commentBody,
     });
   } else if (eventContext.name === "discussion_comment") {
     console.log("Creating reply to discussion comment");
     // https://docs.github.com/en/graphql/reference/mutations#adddiscussioncomment
     const input: AddDiscussionCommentInput = {
-      body: body,
+      body: commentBody,
       discussionId: payload.discussion.node_id,
       replyToId: payload.comment.node_id,
     };
