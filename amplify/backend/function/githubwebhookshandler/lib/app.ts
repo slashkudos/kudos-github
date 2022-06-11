@@ -12,6 +12,7 @@ import {
   AddDiscussionCommentPayload,
 } from "@octokit/graphql-schema";
 import { GitHubCommentCreatedEvent } from "./models/GitHub/GitHubCommentCreatedEvent";
+import { KudosGitHubMetadata } from "./models/KudosGitHubMetadata";
 
 const app = (app: Probot) => {
   app.onAny((event: EmitterWebhookEvent): void =>
@@ -70,7 +71,10 @@ const app = (app: Probot) => {
             continue;
           }
 
-          await createKudo(kudosClient, giver, receiverUser, comment);
+          await createKudo(kudosClient, giver, receiverUser, comment, {
+            repositoryPublic: payload.repository.public === true,
+            repositoryUrl: payload.repository.html_url,
+          });
 
           const userTotal = await kudosClient.getTotalKudosForReceiver(
             receiverLogin,
@@ -89,7 +93,8 @@ async function createKudo(
   kudosClient: KudosApiClient,
   giver: string,
   receiverUser: User,
-  comment: GitHubComment
+  comment: GitHubComment,
+  metadata: KudosGitHubMetadata
 ) {
   const link = comment.html_url || comment.url;
   await kudosClient.createKudo({
@@ -97,9 +102,12 @@ async function createKudo(
     receiverUsername: receiverUser.login,
     message: comment.body.trim(),
     link: link,
+    giverProfileUrl: comment.user.html_url,
     giverProfileImageUrl: comment.user.avatar_url,
+    receiverProfileUrl: receiverUser.html_url,
     receiverProfileImageUrl: receiverUser.avatar_url,
     dataSource: DataSourceApp.github,
+    metadata: metadata,
   });
 }
 
