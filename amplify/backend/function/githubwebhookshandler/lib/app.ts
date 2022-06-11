@@ -72,7 +72,7 @@ const app = (app: Probot) => {
           }
 
           await createKudo(kudosClient, giver, receiverUser, comment, {
-            repositoryPublic: payload.repository.public === true,
+            repositoryPublic: payload.repository.private === false,
             repositoryUrl: payload.repository.html_url,
           });
 
