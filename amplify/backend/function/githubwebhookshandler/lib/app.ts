@@ -12,6 +12,7 @@ import {
   AddDiscussionCommentPayload,
 } from "@octokit/graphql-schema";
 import { GitHubCommentCreatedEvent } from "./models/GitHub/GitHubCommentCreatedEvent";
+import { KudosGitHubMetadata } from "./models/KudosGitHubMetadata";
 
 const app = (app: Probot) => {
   app.onAny((event: EmitterWebhookEvent): void =>
@@ -27,6 +28,7 @@ const app = (app: Probot) => {
       console.log(`Received ${eventContext.name} event`);
 
       const payload = eventContext.payload as GitHubCommentCreatedEvent;
+      const repo = payload.repository;
       const comment = payload.comment as unknown as GitHubComment;
       const commentBody = comment.body.trim();
 
@@ -70,7 +72,11 @@ const app = (app: Probot) => {
             continue;
           }
 
-          await createKudo(kudosClient, giver, receiverUser, comment);
+          await createKudo(kudosClient, giver, receiverUser, comment, {
+            repositoryPublic: repo.private === false,
+            repositoryUrl: repo.html_url,
+            ownerUrl: repo.owner.html_url
+          });
 
           const userTotal = await kudosClient.getTotalKudosForReceiver(
             receiverLogin,
@@ -89,7 +95,8 @@ async function createKudo(
   kudosClient: KudosApiClient,
   giver: string,
   receiverUser: User,
-  comment: GitHubComment
+  comment: GitHubComment,
+  metadata: KudosGitHubMetadata
 ) {
   const link = comment.html_url || comment.url;
   await kudosClient.createKudo({
@@ -97,9 +104,12 @@ async function createKudo(
     receiverUsername: receiverUser.login,
     message: comment.body.trim(),
     link: link,
+    giverProfileUrl: comment.user.html_url,
     giverProfileImageUrl: comment.user.avatar_url,
+    receiverProfileUrl: receiverUser.html_url,
     receiverProfileImageUrl: receiverUser.avatar_url,
     dataSource: DataSourceApp.github,
+    metadata: metadata,
   });
 }
 
@@ -115,23 +125,26 @@ async function createComment(
 ) {
   const octokit = eventContext.octokit;
 
-  let commentBody = `Congrats @${receiver}, you just got another [kudo](https://app.slashkudos.com/)! :tada:`;
+  const siteUrl =
+    process.env.IS_PROD_APP === "true"
+      ? "https://app.slashkudos.com/"
+      : "https://app-dev.slashkudos.com/";
+
+  let commentBody = `Congrats @${receiver}, you just got another [kudo](${siteUrl})! :tada:`;
   if (totalKudos) {
-    commentBody = `Congrats @${receiver}, you now have ${totalKudos} [kudos](https://app.slashkudos.com/)! :tada:`;
+    commentBody = `Congrats @${receiver}, you now have ${totalKudos} [kudos](${siteUrl})! :tada:`;
     if (totalKudos === 1) {
-      commentBody = `Congrats @${receiver}, you just got your first [kudo](https://app.slashkudos.com/)! :tada: :partying_face:`;
+      commentBody = `Congrats @${receiver}, you just got your first [kudo](${siteUrl})! :tada: :partying_face:`;
     }
   } else {
     console.log("WARN: Could not find total kudos for receiver: " + receiver);
   }
 
-  const quoteOriginalComment = `> ${payload.comment.body.trim()}\n\n`;
-  const bodyWithQuote = `${quoteOriginalComment}${commentBody}`;
   if (eventContext.name === "issue_comment") {
     console.log("Creating comment on issue");
     await octokit.issues.createComment({
       ...eventContext.issue(),
-      body: bodyWithQuote,
+      body: commentBody,
     });
   } else if (eventContext.name === "pull_request_review_comment") {
     console.log("Creating reply on PR review comment");
