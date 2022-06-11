@@ -123,11 +123,16 @@ async function createComment(
 ) {
   const octokit = eventContext.octokit;
 
-  let commentBody = `Congrats @${receiver}, you just got another [kudo](https://app.slashkudos.com/)! :tada:`;
+  const siteUrl =
+    process.env.IS_PROD_APP === "true"
+      ? "https://app.slashkudos.com/"
+      : "https://app-dev.slashkudos.com/";
+
+  let commentBody = `Congrats @${receiver}, you just got another [kudo](${siteUrl})! :tada:`;
   if (totalKudos) {
-    commentBody = `Congrats @${receiver}, you now have ${totalKudos} [kudos](https://app.slashkudos.com/)! :tada:`;
+    commentBody = `Congrats @${receiver}, you now have ${totalKudos} [kudos](${siteUrl})! :tada:`;
     if (totalKudos === 1) {
-      commentBody = `Congrats @${receiver}, you just got your first [kudo](https://app.slashkudos.com/)! :tada: :partying_face:`;
+      commentBody = `Congrats @${receiver}, you just got your first [kudo](${siteUrl})! :tada: :partying_face:`;
     }
   } else {
     console.log("WARN: Could not find total kudos for receiver: " + receiver);
