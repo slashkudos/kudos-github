@@ -28,6 +28,7 @@ const app = (app: Probot) => {
       console.log(`Received ${eventContext.name} event`);
 
       const payload = eventContext.payload as GitHubCommentCreatedEvent;
+      const repo = payload.repository;
       const comment = payload.comment as unknown as GitHubComment;
       const commentBody = comment.body.trim();
 
@@ -72,8 +73,9 @@ const app = (app: Probot) => {
           }
 
           await createKudo(kudosClient, giver, receiverUser, comment, {
-            repositoryPublic: payload.repository.private === false,
-            repositoryUrl: payload.repository.html_url,
+            repositoryPublic: repo.private === false,
+            repositoryUrl: repo.html_url,
+            ownerUrl: repo.owner.html_url
           });
 
           const userTotal = await kudosClient.getTotalKudosForReceiver(
