@@ -1,6 +1,7 @@
 import { Context, Probot } from "probot";
 import {
   DataSourceApp,
+  GitHubMetadata,
   KudosApiClient,
   KudosGraphQLConfig,
 } from "@slashkudos/kudos-api";
@@ -12,7 +13,6 @@ import {
   AddDiscussionCommentPayload,
 } from "@octokit/graphql-schema";
 import { GitHubCommentCreatedEvent } from "./models/GitHub/GitHubCommentCreatedEvent";
-import { KudosGitHubMetadata } from "./models/KudosGitHubMetadata";
 
 const app = (app: Probot) => {
   app.onAny((event: EmitterWebhookEvent): void =>
@@ -75,14 +75,20 @@ const app = (app: Probot) => {
           await createKudo(kudosClient, giver, receiverUser, comment, {
             repositoryPublic: repo.private === false,
             repositoryUrl: repo.html_url,
-            ownerUrl: repo.owner.html_url
+            ownerUrl: repo.owner.html_url,
           });
 
           const userTotal = await kudosClient.getTotalKudosForReceiver(
             receiverLogin,
             DataSourceApp.github
           );
-          await createComment(eventContext, receiverLogin, payload, userTotal);
+          await createComment(
+            eventContext,
+            receiverLogin,
+            payload,
+            repo.private === false,
+            userTotal
+          );
         }
       } else {
         console.log("Not a kudos comment");
@@ -96,7 +102,7 @@ async function createKudo(
   giver: string,
   receiverUser: User,
   comment: GitHubComment,
-  metadata: KudosGitHubMetadata
+  metadata: GitHubMetadata
 ) {
   const link = comment.html_url || comment.url;
   await kudosClient.createKudo({
@@ -121,6 +127,7 @@ async function createComment(
   >,
   receiver: string,
   payload: GitHubCommentCreatedEvent,
+  repositoryPublic: boolean,
   totalKudos?: number | null
 ) {
   const octokit = eventContext.octokit;
@@ -138,6 +145,9 @@ async function createComment(
     }
   } else {
     console.log("WARN: Could not find total kudos for receiver: " + receiver);
+  }
+  if (!repositoryPublic) {
+    commentBody += ` [^1]\n\n[^1]: This kudo was given in a private repository so it will not be displayed in the [public feed](${siteUrl})`;
   }
 
   if (eventContext.name === "issue_comment") {
