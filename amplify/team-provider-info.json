@@ -15,9 +15,11 @@
       "function": {
         "githubwebhookshandler": {
           "deploymentBucketName": "amplify-kudosgithub-prod-42812-deployment",
-          "s3Key": "amplify-builds/githubwebhookshandler-485531717a456f4b5563-build.zip",
+          "s3Key": "amplify-builds/githubwebhookshandler-6c677866613847414f68-build.zip",
+          "secretsPathAmplifyAppId": "d2rgnllrb072gz",
           "appId": "205195",
-          "secretsPathAmplifyAppId": "d2rgnllrb072gz"
+          "githubClientId": "Iv1.3375ac069e7e6ad2",
+          "kudosGraphqlApiUrl": "https://graphqlapi.slashkudos.com/graphql"
         }
       }
     }

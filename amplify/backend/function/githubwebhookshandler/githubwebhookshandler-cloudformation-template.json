@@ -16,10 +16,16 @@
     "s3Key": {
       "Type": "String"
     },
+    "secretsPathAmplifyAppId": {
+      "Type": "String"
+    },
     "appId": {
       "Type": "String"
     },
-    "secretsPathAmplifyAppId": {
+    "githubClientId": {
+      "Type": "String"
+    },
+    "kudosGraphqlApiUrl": {
       "Type": "String"
     }
   },
@@ -76,9 +82,6 @@
             "REGION": {
               "Ref": "AWS::Region"
             },
-            "APP_ID": {
-              "Ref": "appId"
-            },
             "PRIVATE_KEY": {
               "Fn::Join": [
                 "",
@@ -122,6 +125,59 @@
                   "WEBHOOK_SECRET"
                 ]
               ]
+            },
+            "KUDOS_GRAPHQL_API_KEY": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Fn::Sub": [
+                      "/amplify/${appId}/${env}/AMPLIFY_${functionName}_",
+                      {
+                        "appId": {
+                          "Ref": "secretsPathAmplifyAppId"
+                        },
+                        "env": {
+                          "Ref": "env"
+                        },
+                        "functionName": "githubwebhookshandler"
+                      }
+                    ]
+                  },
+                  "KUDOS_GRAPHQL_API_KEY"
+                ]
+              ]
+            },
+            "GITHUB_CLIENT_SECRET": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Fn::Sub": [
+                      "/amplify/${appId}/${env}/AMPLIFY_${functionName}_",
+                      {
+                        "appId": {
+                          "Ref": "secretsPathAmplifyAppId"
+                        },
+                        "env": {
+                          "Ref": "env"
+                        },
+                        "functionName": "githubwebhookshandler"
+                      }
+                    ]
+                  },
+                  "GITHUB_CLIENT_SECRET"
+                ]
+              ]
+            },
+            "APP_ID": {
+              "Ref": "appId"
+            },
+            "GITHUB_CLIENT_ID": {
+              "Ref": "githubClientId"
+            },
+            "KUDOS_GRAPHQL_API_URL": {
+              "Ref": "kudosGraphqlApiUrl"
             }
           }
         },

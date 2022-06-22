@@ -4,10 +4,20 @@
     {
       "cloudFormationParameterName": "appId",
       "environmentVariableName": "APP_ID"
+    },
+    {
+      "cloudFormationParameterName": "githubClientId",
+      "environmentVariableName": "GITHUB_CLIENT_ID"
+    },
+    {
+      "cloudFormationParameterName": "kudosGraphqlApiUrl",
+      "environmentVariableName": "KUDOS_GRAPHQL_API_URL"
     }
   ],
   "secretNames": [
     "PRIVATE_KEY",
-    "WEBHOOK_SECRET"
+    "WEBHOOK_SECRET",
+    "KUDOS_GRAPHQL_API_KEY",
+    "GITHUB_CLIENT_SECRET"
   ]
 }
