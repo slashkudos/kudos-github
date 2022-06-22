@@ -78,9 +78,8 @@ const app = (app: Probot) => {
             ownerUrl: repo.owner.html_url,
           });
 
-          const userTotal = await kudosClient.getTotalKudosForReceiver(
-            receiverLogin,
-            DataSourceApp.github
+          const userTotal = await kudosClient.getTotalKudosForUser(
+            receiverLogin
           );
           await createComment(
             eventContext,
