@@ -8,7 +8,11 @@ import {
   EmitterWebhookEventWithStringPayloadAndSignature,
 } from "@octokit/webhooks/dist-types/types";
 
-type SecretName = "PRIVATE_KEY" | "WEBHOOK_SECRET";
+type SecretName =
+  | "PRIVATE_KEY"
+  | "WEBHOOK_SECRET"
+  | "GITHUB_CLIENT_SECRET"
+  | "KUDOS_GRAPHQL_API_KEY";
 
 const handler = async (
   event: APIGatewayEvent
@@ -30,34 +34,10 @@ const handler = async (
     ).toString("utf-8");
   } else {
     // Get secrets from SSM
-    const secretNames: SecretName[] = ["PRIVATE_KEY", "WEBHOOK_SECRET"];
-    const ssmParameterNames = secretNames
-      .map((secretName) => process.env[secretName])
-      .filter((parameterPath) => parameterPath != null) as string[];
-
-    const { Parameters } = await new aws.SSM()
-      .getParameters({
-        Names: ssmParameterNames,
-        WithDecryption: true,
-      })
-      .promise();
-    if (!Parameters) {
-      throw new Error("No parameters found");
-    }
-    const privateKey = Parameters.find((p) =>
-      p.Name?.endsWith("PRIVATE_KEY")
-    )?.Value;
-    if (!privateKey) {
-      throw "Missing PRIVATE_KEY";
-    }
-    privateKeyBase64 = Buffer.from(privateKey, "base64").toString("utf-8");
-    process.env.WEBHOOK_SECRET = Parameters.find((p) =>
-      p.Name?.endsWith("WEBHOOK_SECRET")
-    )?.Value;
-  }
-
-  if (!process.env.WEBHOOK_SECRET) {
-    throw "Missing WEBHOOK_SECRET";
+    await loadSecrets();
+    privateKeyBase64 = Buffer.from(process.env.PRIVATE_KEY!, "base64").toString(
+      "utf-8"
+    );
   }
   if (!process.env.APP_ID) {
     throw "Missing APP_ID";
@@ -113,6 +93,39 @@ const handler = async (
     };
   }
 };
+
+// Load secrets from SSM and sets environment variables
+async function loadSecrets() {
+  console.log("Loading secrets from SSM");
+  const secretNames: SecretName[] = [
+    "PRIVATE_KEY",
+    "WEBHOOK_SECRET",
+    "KUDOS_GRAPHQL_API_KEY",
+  ];
+  const ssmParameterNames = secretNames
+    .map((secretName) => process.env[secretName])
+    .filter((parameterPath) => parameterPath != null) as string[];
+
+  const { Parameters } = await new aws.SSM()
+    .getParameters({
+      Names: ssmParameterNames,
+      WithDecryption: true,
+    })
+    .promise();
+  if (!Parameters) {
+    throw new Error("No parameters found");
+  }
+
+  secretNames.forEach((secretName) => {
+    const secretValue = Parameters.find((p) =>
+      p.Name?.endsWith(secretName)
+    )?.Value;
+    if (!secretValue) {
+      throw `Missing ${secretName}`;
+    }
+    process.env[secretName] = secretValue;
+  });
+}
 
 exports.handler = handler;
 export default handler;
