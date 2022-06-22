@@ -120,6 +120,7 @@ async function loadSecrets() {
     const secretValue = Parameters.find((p) =>
       p.Name?.endsWith(secretName)
     )?.Value;
+    console.log(`Setting process.env.${secretName}`);
     if (!secretValue) {
       throw `Missing ${secretName}`;
     }
