@@ -62,6 +62,8 @@ const app = (app: Probot) => {
         const giver = comment.user.login;
         for (const mention of mentions) {
           const receiverLogin = mention;
+
+          console.log(`Looking up user ${receiverLogin}`);
           const getReceiverResponse = await octokit.users.getByUsername({
             username: receiverLogin,
           });

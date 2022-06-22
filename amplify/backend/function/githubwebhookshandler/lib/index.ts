@@ -23,21 +23,15 @@ const handler = async (
   process.env.IS_MOCK = isMock.toString();
   process.env.IS_PROD_APP = (process.env.APP_ID === "205195").toString();
 
-  let privateKeyBase64: string;
+  console.log(`IS_MOCK: ${process.env.IS_MOCK}`);
+  console.log(`IS_PROD_APP: ${process.env.IS_PROD_APP}`);
 
   if (isMock) {
     process.env.WEBHOOK_SECRET = process.env.WEBHOOK_SECRET || "MOCK";
     process.env.APP_ID = process.env.APP_ID || "MOCK";
-    privateKeyBase64 = Buffer.from(
-      process.env.PRIVATE_KEY || "MOCK",
-      "base64"
-    ).toString("utf-8");
   } else {
     // Get secrets from SSM
     await loadSecrets();
-    privateKeyBase64 = Buffer.from(process.env.PRIVATE_KEY!, "base64").toString(
-      "utf-8"
-    );
   }
   if (!process.env.APP_ID) {
     throw "Missing APP_ID";
@@ -45,10 +39,11 @@ const handler = async (
 
   let probot = new Probot({
     appId: process.env.APP_ID,
-    privateKey: privateKeyBase64,
+    privateKey: process.env.PRIVATE_KEY,
     secret: process.env.WEBHOOK_SECRET,
   });
 
+  console.log("Loading probot app");
   await probot.load(slashkudosBot);
 
   const eventHeaders = {
@@ -81,6 +76,7 @@ const handler = async (
         webhookEvent as unknown as EmitterWebhookEvent
       );
     } else {
+      console.log("Verifying signature and handling webhook event");
       await probot.webhooks.verifyAndReceive(webhookEvent);
     }
     return {
@@ -95,12 +91,13 @@ const handler = async (
 };
 
 // Load secrets from SSM and sets environment variables
-async function loadSecrets() {
+const loadSecrets = async () => {
   console.log("Loading secrets from SSM");
   const secretNames: SecretName[] = [
     "PRIVATE_KEY",
     "WEBHOOK_SECRET",
     "KUDOS_GRAPHQL_API_KEY",
+    "GITHUB_CLIENT_SECRET",
   ];
   const ssmParameterNames = secretNames
     .map((secretName) => process.env[secretName])
@@ -126,7 +123,7 @@ async function loadSecrets() {
     }
     process.env[secretName] = secretValue;
   });
-}
+};
 
 exports.handler = handler;
 export default handler;
