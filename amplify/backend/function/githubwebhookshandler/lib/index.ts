@@ -101,7 +101,16 @@ const loadSecrets = async () => {
   ];
   const ssmParameterNames = secretNames
     .map((secretName) => process.env[secretName])
-    .filter((parameterPath) => parameterPath != null) as string[];
+    .filter(
+      (parameterPath) =>
+        parameterPath != null &&
+        parameterPath.includes("/AMPLIFY_githubwebhookshandler_")
+    ) as string[];
+
+  if (ssmParameterNames.length === 0) {
+    console.log("Parameters are already loaded. Skipping loading from SSM");
+    return;
+  }
 
   const ssm = new aws.SSM({ logger: console });
   const { Parameters } = await ssm
