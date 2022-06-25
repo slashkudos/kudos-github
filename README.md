@@ -11,9 +11,9 @@ Build team morale by giving kudos to your teammates directly from issues, pull r
 
 Kudos given on public repositories will be displayed on [app.slashkudos.com]. Kudos given on private repositories will NOT be displayed on [app.slashkudos.com] to avoid sharing private information.
 
-## Currently in beta
+## Next up
 
-The slashkudos GitHub app is currently in beta. We plan to add support for connecting your GitHub account to [app.slashkudos.com] so you can easily see all kudos given in your orgs, teams and private repositories in one place.
+We plan to add support for connecting your GitHub account to [app.slashkudos.com] so you can easily see all kudos given in your orgs, teams and private repositories in one place.
 
 <!-- Links -->
 [app.slashkudos.com]: https://app.slashkudos.com/
