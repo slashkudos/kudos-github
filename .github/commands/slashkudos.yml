@@ -12,7 +12,7 @@ surfaces:
 
 steps:
   - type: form
-    style: embedded
+    style: modal
     body:
       - type: input
         attributes:
