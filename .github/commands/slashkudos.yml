@@ -26,5 +26,3 @@ steps:
     actions:
       submit: "Create"
       cancel: "Discard"
-  - type: fill
-    template: "Congrats {{ data.User }}, you just got some kudos from {{ command.user.login }}!"
