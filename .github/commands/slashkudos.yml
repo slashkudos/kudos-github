@@ -1,6 +1,6 @@
 # Learn more about the syntax here:
 # https://docs.github.com/en/early-access/github/save-time-with-slash-commands/syntax-for-user-defined-slash-commands
----
+
 trigger: kudos
 title: kudos
 description: 'Give kudos to your teammates'
