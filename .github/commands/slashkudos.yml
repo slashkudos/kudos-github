@@ -3,8 +3,13 @@
 ---
 trigger: kudos
 title: kudos
-description: "/kudos @philip-gai for the super clean PR 😎"
-surfaces: [issue, pull_request, discussion]
+description: 'Give kudos to your teammates'
+
+surfaces:
+  - issue
+  - pull_request
+  - discussions
+
 steps:
   - type: form
     style: embedded
@@ -12,17 +17,10 @@ steps:
       - type: input
         attributes:
           label: User
-          description: "Who do you want to give the kudos to?"
-          placeholder: "@user"
         validations:
           required: true
       - type: input
         attributes:
           label: Message
-          description: "What did they do?"
-          placeholder: "for being awesome"
         validations:
           required: true
-    actions:
-      submit: "Create"
-      cancel: "Discard"
