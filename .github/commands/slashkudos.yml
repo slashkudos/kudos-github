@@ -8,7 +8,7 @@ description: 'Give kudos to your teammates'
 surfaces:
   - issue
   - pull_request
-  - discussions
+  - discussion
 
 steps:
   - type: form
