@@ -103,7 +103,8 @@ const loadSecrets = async () => {
     .map((secretName) => process.env[secretName])
     .filter((parameterPath) => parameterPath != null) as string[];
 
-  const { Parameters } = await new aws.SSM()
+  const ssm = new aws.SSM({ logger: console });
+  const { Parameters } = await ssm
     .getParameters({
       Names: ssmParameterNames,
       WithDecryption: true,
