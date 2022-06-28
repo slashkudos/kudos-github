@@ -6,6 +6,8 @@ Build team morale by giving kudos to your teammates directly from issues, pull r
 
 1. Install the slashkudos app on your repository
 2. Start giving kudos! For example: `/kudos to @philip-gai for your first contribution! 🎉`
+3. slashkudos will respond with how many total kudos the user has received
+4. View your kudos on [app.slashkudos.com]!
 
 ## What kudos will be public?
 
